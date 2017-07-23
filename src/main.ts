@@ -18,7 +18,10 @@ if (Config.USE_PROFILER) {
   Profiler.enable();
 }
 
-log.info(`loading revision: ${ __REVISION__ }`);
+if (Memory.version !== __REVISION__) {
+  Memory.version = __REVISION__;
+  log.info(`loading revision: ${ __REVISION__ }`);
+}
 
 function mloop() {
   // Check memory for null or out of bounds custom objects
