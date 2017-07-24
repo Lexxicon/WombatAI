@@ -1,5 +1,5 @@
-import * as Config from "../../config/config";
-import { LogLevels } from "./logLevels";
+import * as Config from "config/config";
+import { LogLevels } from "lib/logger/logLevels";
 
 function color(str: string, _color: string): string {
   return `<font color='${_color}'>${str}</font>`;
@@ -32,11 +32,13 @@ export class Log {
   public set showTick(value: boolean) { Memory.log.showTick = value; }
 
   constructor() {
-    _.defaultsDeep(Memory, { log: {
-      level: Config.LOG_LEVEL,
-      showSource: Config.LOG_PRINT_LINES,
-      showTick: Config.LOG_PRINT_TICK,
-    }});
+    _.defaultsDeep(Memory, {
+      log: {
+        level: Config.LOG_LEVEL,
+        showSource: Config.LOG_PRINT_LINES,
+        showTick: Config.LOG_PRINT_TICK,
+      }
+    });
   }
 
   public error(...args: any[]) {

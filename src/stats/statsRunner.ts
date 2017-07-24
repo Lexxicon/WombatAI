@@ -1,15 +1,16 @@
 export class StatsRunner {
-  public init() {
-    Memory.stats = {};
-    Memory.stats[Memory.username] = { rooms: [] };
+  public constructor() {
+    if (!Memory.stats) {
+      Memory.stats = {};
+    }
     _.defaultsDeep(Memory.stats[Memory.username], {
+      rooms: [],
       cpu: {
         bucket: 0,
         limit: 0,
         tickLimit: 0,
         used: 0,
       },
-      rooms: [],
       gcl: {
         progress: 0,
         progressTotal: 0,
@@ -24,10 +25,6 @@ export class StatsRunner {
   public create() {
     const roomsStat = Memory.stats[Memory.username].rooms;
     for (const id in Game.rooms) {
-      const room = Game.rooms[id];
-      if (!roomsStat[id]) {
-        roomsStat[id] = {};
-      }
       _.defaultsDeep(roomsStat[id], {
         energy: {
           available: 0,
@@ -41,7 +38,7 @@ export class StatsRunner {
           level: 0,
         },
       });
-
+      const room = Game.rooms[id];
       const ctrl = roomsStat[id].controller;
       ctrl.progressTotal = _.get(room, "controller.progressTotal", 0);
       ctrl.progress = _.get(room, "controller.progress", 0);
