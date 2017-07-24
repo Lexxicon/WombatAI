@@ -11,8 +11,6 @@ Memory.username = Memory.username
   || _.chain(Game.rooms).map("controller").flatten().filter("my").map("owner.username").first();
 
 export const loop = () => {
-  log.debug("starting");
 
-  stats.create();
-  log.debug("ending");
+  stats.postTickStats();
 };

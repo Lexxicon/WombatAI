@@ -22,41 +22,50 @@ export class StatsRunner {
     });
   }
 
-  public create() {
-    const roomsStat = Memory.stats[Memory.username].rooms;
-    for (const id in Game.rooms) {
-      _.defaultsDeep(roomsStat[id], {
-        energy: {
-          available: 0,
-          capacity: 0,
-          sources: 0,
-          storage: 0,
-        },
-        controller: {
-          progress: 0,
-          progressTotal: 0,
-          level: 0,
-        },
-      });
-      const room = Game.rooms[id];
-      const ctrl = roomsStat[id].controller;
-      ctrl.progressTotal = _.get(room, "controller.progressTotal", 0);
-      ctrl.progress = _.get(room, "controller.progress", 0);
-      ctrl.level = _.get(room, "controller.level", 0);
+  public postTickStats() {
+    const mem = Memory.stats[Memory.username];
+    mem.rooms = _.mapValues(Game.rooms, this.toRoomStats);
 
-      roomsStat[id].energy.available = room.energyAvailable;
-      roomsStat[id].energy.capacity = room.energyCapacityAvailable;
-      roomsStat[id].energy.sources = _.sum(_.map(room.find(FIND_SOURCES), "energy"));
-      roomsStat[id].energy.capacity = _.get(room.storage, RESOURCE_ENERGY, 0);
-    }
+    mem.cpu.limit = Game.cpu.limit;
+    mem.cpu.bucket = Game.cpu.bucket;
+    mem.cpu.used = Game.cpu.getUsed;
+    mem.cpu.tickLimit = Game.cpu.tickLimit;
 
-    Memory.stats[Memory.username].cpu.limit = Game.cpu.limit;
-    Memory.stats[Memory.username].cpu.bucket = Game.cpu.bucket;
-    Memory.stats[Memory.username].cpu.used = Game.cpu.getUsed;
-    Memory.stats[Memory.username].cpu.tickLimit = Game.cpu.tickLimit;
+    mem.gcl.progress = Game.gcl.progress;
+    mem.gcl.progressTotal = Game.gcl.progressTotal;
+    mem.gcl.level = Game.gcl.level;
+  }
 
-    Memory.stats[Memory.username].gcl.progress = Game.gcl.progress;
-    Memory.stats[Memory.username].gcl.progressTotal = Game.gcl.progressTotal;
-    Memory.stats[Memory.username].gcl.level = Game.gcl.level;
+  private toRoomStats(room: Room): any {
+    const stat = {
+      energy: {
+        available: 0,
+        capacity: 0,
+        sources: [],
+        storage: 0,
+      },
+      controller: {
+        progress: 0,
+        progressTotal: 0,
+        level: 0,
+      },
+    };
+    const ctrl = stat.controller;
+    ctrl.progressTotal = _.get(room, "controller.progressTotal", 0);
+    ctrl.progress = _.get(room, "controller.progress", 0);
+    ctrl.level = _.get(room, "controller.level", 0);
+
+    const engy = stat.energy;
+    engy.available = room.energyAvailable;
+    engy.capacity = room.energyCapacityAvailable;
+    engy.sources = _.reduce(room.find(FIND_SOURCES), this.sourceToStat, {});
+    engy.capacity = _.get(room.storage, RESOURCE_ENERGY, 0);
+
+    return stat;
+  }
+
+  private sourceToStat(acc: any, source: Source): any {
+    acc[source.id] = { energy: source.energy, ttl: source.ticksToRegeneration };
+    return acc;
   }
 }
