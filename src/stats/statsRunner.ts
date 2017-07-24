@@ -3,6 +3,9 @@ export class StatsRunner {
     if (!Memory.stats) {
       Memory.stats = {};
     }
+    if (!Memory.stats[Memory.username]) {
+      Memory.stats[Memory.username] = {};
+    }
     _.defaultsDeep(Memory.stats[Memory.username], {
       rooms: [],
       cpu: {
@@ -36,12 +39,12 @@ export class StatsRunner {
     mem.gcl.level = Game.gcl.level;
   }
 
-  private toRoomStats(room: Room): any {
+  private toRoomStats: any = (room: Room) => {
     const stat = {
       energy: {
         available: 0,
         capacity: 0,
-        sources: [],
+        sources: {},
         storage: 0,
       },
       controller: {
@@ -64,7 +67,7 @@ export class StatsRunner {
     return stat;
   }
 
-  private sourceToStat(acc: any, source: Source): any {
+  private sourceToStat: any = (acc: any, source: Source) => {
     acc[source.id] = { energy: source.energy, ttl: source.ticksToRegeneration };
     return acc;
   }

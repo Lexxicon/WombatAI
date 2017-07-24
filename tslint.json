@@ -1,13 +1,20 @@
 {
-  "extends" : [
+  "extends": [
     "tslint:recommended"
   ],
   "enable": true,
   "rules": {
     "forin": false,
-    "interface-name": [false],
-    "no-console": [false],
+    "interface-name": [
+      false
+    ],
+    "no-console": [
+      false
+    ],
     "object-literal-sort-keys": false,
+    "only-arrow-functions": [
+      true
+    ],
     "trailing-comma": [
       true,
       "never"
@@ -39,6 +46,9 @@
       "check-separator",
       "check-type"
     ],
-    "semicolon": [true, "always"]
+    "semicolon": [
+      true,
+      "always"
+    ]
   }
 }

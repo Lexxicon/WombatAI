@@ -1,3 +1,5 @@
+import { BodyDef } from "core/bodyDef";
 export interface Behaviour {
-  run(creep: Creep): void;
+  getBody: () => BodyDef;
+  run: (creep: Creep) => void;
 }

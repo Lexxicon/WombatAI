@@ -1,12 +1,18 @@
 import { Behaviour } from "behaviour/behaviour";
+import { BodyDef } from "core/bodyDef";
 import { log } from "lib/logger/log";
-export enum State {
+
+enum State {
   HARVEST = 1,
   DROP_OFF,
 }
-export class EmergencyMiner implements Behaviour {
 
-  public run(creep: Creep): void {
+export class EmergencyMiner implements Behaviour {
+  public getBody = () => {
+    return new BodyDef([WORK, MOVE, CARRY], { state: State.HARVEST }, "EmergencyMiner");
+  }
+
+  public run = (creep: Creep) => {
     creep.memory.state = this.updateState(creep);
     switch (creep.memory.state) {
       case State.DROP_OFF:
