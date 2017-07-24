@@ -1,64 +1,9 @@
 import * as Config from "../../config/config";
 import { LogLevels } from "./logLevels";
 
-// <caller> (<source>:<line>:<column>)
-const stackLineRe = /([^ ]*) \(([^:]*):([0-9]*):([0-9]*)\)/;
-
-interface SourcePos {
-  compiled: string;
-  final: string;
-  original: string | undefined;
-  caller: string | undefined;
-  path: string | undefined;
-  line: number | undefined;
-}
-
-export function resolve(fileLine: string): SourcePos {
-  const split = _.trim(fileLine).match(stackLineRe);
-  if (!split || !Log.sourceMap) {
-    return { compiled: fileLine, final: fileLine } as SourcePos;
-  }
-
-  const pos = { column: parseInt(split[4], 10), line: parseInt(split[3], 10) };
-
-  const original = Log.sourceMap.originalPositionFor(pos);
-  const line = `${split[1]} (${original.source}:${original.line})`;
-  const out = {
-      caller: split[1],
-      compiled: fileLine,
-      final: line,
-      line: original.line,
-      original: line,
-      path: original.source,
-    };
-
-  return out;
-}
-
-function makeVSCLink(pos: SourcePos): string {
-  if (!Config.LOG_VSC.valid || !pos.caller || !pos.path || !pos.line || !pos.original) {
-    return pos.final;
-  }
-
-  return link(vscUrl(pos.path, `L${pos.line.toString()}`), pos.original);
-}
-
 function color(str: string, _color: string): string {
   return `<font color='${_color}'>${str}</font>`;
 }
-
-function tooltip(str: string, _tooltip: string): string {
-  return `<abbr title='${_tooltip}'>${str}</abbr>`;
-}
-
-function vscUrl(path: string, line: string): string {
-  return Config.LOG_VSC_URL_TEMPLATE(path, line);
-}
-
-function link(href: string, title: string): string {
-  return `<a href='${href}' target="_blank">${title}</a>`;
-}
-
 function time(): string {
   return color(Game.time.toString(), "gray");
 }
@@ -86,22 +31,12 @@ export class Log {
   public get showTick(): boolean { return Memory.log.showTick; }
   public set showTick(value: boolean) { Memory.log.showTick = value; }
 
-  private _maxFileString: number = 0;
-
   constructor() {
     _.defaultsDeep(Memory, { log: {
       level: Config.LOG_LEVEL,
       showSource: Config.LOG_PRINT_LINES,
       showTick: Config.LOG_PRINT_TICK,
     }});
-  }
-
-  public trace(error: Error): Log {
-    if (this.level >= LogLevels.ERROR && error.stack) {
-      console.log(this.resolveStack(error.stack));
-    }
-
-    return this;
   }
 
   public error(...args: any[]) {
@@ -128,26 +63,15 @@ export class Log {
     }
   }
 
-  public getFileLine(upStack = 4): string {
-    const stack = new Error("").stack;
-
-    if (stack) {
-      const lines = stack.split("\n");
-
-      if (lines.length > upStack) {
-        const originalLines = _.drop(lines, upStack).map(resolve);
-        const hoverText = _.map(originalLines, "final").join("&#10;");
-        return this.adjustFileLine(
-          originalLines[0].final,
-          tooltip(makeVSCLink(originalLines[0]), hoverText)
-        );
-      }
-    }
+  public getFileLine(): string {
     return "";
   }
 
   private buildArguments(level: number): string[] {
     const out: string[] = [];
+    if (this.showTick) {
+      out.push(time());
+    }
     switch (level) {
       case LogLevels.ERROR:
         out.push(color("ERROR  ", "red"));
@@ -164,33 +88,11 @@ export class Log {
       default:
         break;
     }
-    if (this.showTick) {
-      out.push(time());
-    }
     if (this.showSource) {
-      out.push(this.getFileLine());
+      // out.push(this.getFileLine());
     }
     return out;
   }
-
-  private resolveStack(stack: string): string {
-    if (!Log.sourceMap) {
-      return stack;
-    }
-
-    return _.map(stack.split("\n").map(resolve), "final").join("\n");
-  }
-
-  private adjustFileLine(visibleText: string, line: string): string {
-    const newPad = Math.max(visibleText.length, this._maxFileString);
-    this._maxFileString = Math.min(newPad, Config.LOG_MAX_PAD);
-
-    return `|${_.padRight(line, line.length + this._maxFileString - visibleText.length, " ")}|`;
-  }
-}
-
-if (Config.LOG_LOAD_SOURCE_MAP) {
-  Log.loadSourceMap();
 }
 
 export const log = new Log();

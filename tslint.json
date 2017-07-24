@@ -2,13 +2,20 @@
   "extends" : [
     "tslint:recommended"
   ],
+  "enable": true,
   "rules": {
     "forin": false,
     "interface-name": [false],
     "no-console": [false],
+    "object-literal-sort-keys": false,
     "trailing-comma": [
       true,
       "never"
+    ],
+    "quotemark": [
+      true,
+      "double",
+      "avoid-escape"
     ],
     "variable-name": [
       true,
@@ -16,6 +23,22 @@
       "check-format",
       "allow-pascal-case",
       "allow-leading-underscore"
-    ]
+    ],
+    "one-line": [
+      true,
+      "check-catch",
+      "check-else",
+      "check-open-brace",
+      "check-whitespace"
+    ],
+    "whitespace": [
+      true,
+      "check-branch",
+      "check-decl",
+      "check-operator",
+      "check-separator",
+      "check-type"
+    ],
+    "semicolon": [true, "always"]
   }
 }

@@ -7,17 +7,6 @@ import { LogLevels } from "../lib/logger/logLevels";
 export const ENABLE_DEBUG_MODE: boolean = true;
 
 /**
- * Enable this to enable screeps profiler
- */
-export const USE_PROFILER: boolean = true;
-
-/**
- * Minimum number of ticksToLive for a Creep before they go to renew.
- * @type {number}
- */
-export const DEFAULT_MIN_LIFE_BEFORE_NEEDS_REFILL: number = 700;
-
-/**
  * Debug level for log output
  */
 export const LOG_LEVEL: number = LogLevels.DEBUG;
