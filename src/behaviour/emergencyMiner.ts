@@ -2,8 +2,14 @@ import { Behaviour } from "behaviour/behaviour";
 import { BodyDef } from "core/bodyDef";
 import { log } from "lib/logger/log";
 
-enum State {
-  HARVEST = 1,
+export enum State {
+  /**
+   * Find near by source, extract, or move closer. If full on energy, switch to DROP_OFF.
+   */
+  HARVEST,
+  /**
+   * Find spawner, transfer energy, or move closer. If empty, switch to HARVEST.
+   */
   DROP_OFF,
 }
 
@@ -24,7 +30,7 @@ export class EmergencyMiner implements Behaviour {
     }
   }
 
-  private dropOff(creep: Creep): void {
+  protected dropOff(creep: Creep): void {
     const target = creep.room.find(FIND_MY_SPAWNS)[0] as Spawn;
     if (!target) {
       log.warning("failed to find drop off spawn");
@@ -35,14 +41,14 @@ export class EmergencyMiner implements Behaviour {
     }
   }
 
-  private harvest(creep: Creep): void {
+  protected harvest(creep: Creep): void {
     const target = creep.pos.findClosestByPath(FIND_SOURCES) as Source;
     if (creep.harvest(target) === ERR_NOT_IN_RANGE) {
       creep.moveTo(target);
     }
   }
 
-  private updateState(creep: Creep): State {
+  protected updateState(creep: Creep): State {
     switch (creep.memory.state) {
       case State.DROP_OFF:
         if (_.sum(creep.carry) === 0) {
