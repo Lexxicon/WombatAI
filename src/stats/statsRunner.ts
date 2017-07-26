@@ -1,3 +1,40 @@
+export interface StatsMemory {
+  rooms: {
+    [room: string]: {
+      energy: {
+        available: number
+        capacity: number
+        storage: number
+        sources: {
+          [sourceID: string]: {
+            energy: number
+            ttl: number
+          }
+        }
+      }
+      controller: {
+        progress: 0
+        progressTotal: 0
+        level: 0
+      }
+    }
+  };
+  cpu: {
+    bucket: number
+    limit: number
+    tickLimit: number
+    used: number
+  };
+  gcl: {
+    progress: number
+    progressTotal: number
+    level: number
+  };
+  memory: {
+    size: number
+  };
+}
+
 export class StatsRunner {
   public constructor() {
     if (!Memory.stats) {
