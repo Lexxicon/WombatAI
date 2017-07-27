@@ -15,6 +15,9 @@
     "only-arrow-functions": [
       true
     ],
+    "no-namespace": [
+      false
+    ],
     "trailing-comma": [
       true,
       "never"

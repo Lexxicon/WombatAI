@@ -1,4 +1,5 @@
 import { log } from "lib/logger/log";
+import { } from "proto/*";
 import { StatsRunner } from "stats/statsRunner";
 import { BodyDef } from "./core/bodyDef";
 import { Hive } from "./core/hive";
@@ -14,7 +15,7 @@ const stats = new StatsRunner();
 
 export const loop = () => {
   const body = new BodyDef([WORK, MOVE], { test: "t" }, "bob");
-  Game.spawns.Spawn1.createCreep(body.parts, body.name, body.memory);
+  Game.spawns.Spawn1.spawn(body);
   _.forEach(Game.rooms, (r) => new Hive(r).run());
   stats.postTickStats();
 };
