@@ -1,5 +1,7 @@
 import { log } from "lib/logger/log";
 import { StatsRunner } from "stats/statsRunner";
+import { BodyDef } from "./core/bodyDef";
+import { Hive } from "./core/hive";
 
 if (Memory.version !== __REVISION__) {
   Memory.version = __REVISION__;
@@ -11,6 +13,8 @@ Memory.username = Memory.username
 const stats = new StatsRunner();
 
 export const loop = () => {
-
+  const body = new BodyDef([WORK, MOVE], { test: "t" }, "bob");
+  Game.spawns.Spawn1.createCreep(body.parts, body.name, body.memory);
+  _.forEach(Game.rooms, (r) => new Hive(r).run());
   stats.postTickStats();
 };
