@@ -1,9 +1,11 @@
 export class Agent {
   public creep: Creep;
-  public memory: any;
+  public memory = {
+    preped: false
+  };
 
   constructor(creep: Creep) {
     this.creep = creep;
-    this.memory = creep.memory;
+    this.memory = _.defaultsDeep(creep.memory, this.memory);
   }
 }

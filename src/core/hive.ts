@@ -17,6 +17,7 @@ export class Hive {
   public coreRoom: Room;
   public mem = {
     state: HiveState.RECOVERY,
+    emergencyMiners: [] as string[],
   };
 
   constructor(room: Room) {
@@ -24,17 +25,29 @@ export class Hive {
     this.mem = (room.memory.hive = room.memory.hive || this.mem);
   }
 
-  public run = (): void => {
+  public run(): void {
     switch (this.mem.state) {
       case HiveState.GROWTH:
-        this.mem.state = HiveState.RECOVERY;
         break;
       case HiveState.RECOVERY:
-        this.mem.state = HiveState.GROWTH;
+        this.recovery();
         break;
       default:
         log.error("unknown state ", this.mem.state);
     }
-    console.log(this.mem.state);
+  }
+
+  public recovery(): void {
+    for (let i = this.mem.emergencyMiners.length - 1; i >= 0; i--) {
+      const name = this.mem.emergencyMiners[i];
+      if (!Game.creeps[name]) {
+        this.mem.emergencyMiners.splice(i, 1);
+        delete Memory.creeps[name];
+      }
+    }
+    const spawns = this.coreRoom.find(FIND_MY_SPAWNS, { filter: { spawning: false } }) as Spawn[];
+    if (spawns.length > 0) {
+
+    }
   }
 }

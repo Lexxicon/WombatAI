@@ -20,6 +20,7 @@
     "**/node_modules/**": true
   },
   "typescript.tsdk": "./node_modules/typescript/lib",
+  "tslint.autoFixOnSave": true,
   "editor.formatOnSave": true,
-  "tslint.autoFixOnSave": true
+  "typescript.format.insertSpaceAfterFunctionKeywordForAnonymousFunctions": false
 }
