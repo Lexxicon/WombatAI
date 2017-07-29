@@ -1,4 +1,7 @@
 import { log } from "lib/logger/log";
+import { Behaviour } from "../behaviour/behaviour";
+import { EmergencyMiner } from "../behaviour/emergencyMiner";
+import { SpawnGroup } from "./SpawnGroup";
 
 export enum HiveState {
   /**
@@ -14,7 +17,13 @@ export enum HiveState {
 }
 
 export class Hive {
+
+  public static behaviours: Behaviour[] = [
+    new EmergencyMiner()
+  ];
+
   public coreRoom: Room;
+  public spawnGroup: SpawnGroup;
   public mem = {
     state: HiveState.RECOVERY,
     emergencyMiners: [] as string[],
@@ -22,15 +31,16 @@ export class Hive {
 
   constructor(room: Room) {
     this.coreRoom = room;
+    this.spawnGroup = new SpawnGroup(room);
     this.mem = (room.memory.hive = room.memory.hive || this.mem);
   }
 
   public run(): void {
+    this.recovery();
     switch (this.mem.state) {
       case HiveState.GROWTH:
         break;
       case HiveState.RECOVERY:
-        this.recovery();
         break;
       default:
         log.error("unknown state ", this.mem.state);
@@ -45,9 +55,14 @@ export class Hive {
         delete Memory.creeps[name];
       }
     }
-    const spawns = this.coreRoom.find(FIND_MY_SPAWNS, { filter: { spawning: false } }) as Spawn[];
-    if (spawns.length > 0) {
+    const result = this.spawnGroup.create(Hive.behaviours[0].getBody());
+    if (_.isString(result)) {
+      this.mem.emergencyMiners.push(result);
+    }
 
+    for (const i in this.mem.emergencyMiners) {
+      const name = this.mem.emergencyMiners[i];
+      Hive.behaviours[0].run(Game.creeps[name]);
     }
   }
 }

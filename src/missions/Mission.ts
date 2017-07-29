@@ -1,9 +1,28 @@
 import { Agent } from "core/agent";
+import { BodyDef } from "../core/bodyDef";
+import { SpawnGroup } from "../core/SpawnGroup";
+
+export interface HeadCountOptions {
+  prespawn?: number;
+  memory?: any;
+  blindSpawn?: boolean;
+  disableNotify?: boolean;
+  skipMoveToRoom?: boolean;
+  boosts?: string[];
+  allowUnboosted?: boolean;
+  altSpawnGroup?: SpawnGroup;
+}
 
 export abstract class Mission {
   public memory = {
     hc: {} as { [role: string]: string[] },
   };
+  public missionName: string;
+  public spawnGroup: SpawnGroup;
+
+  protected constructor(missionName: string) {
+    this.missionName = missionName;
+  }
 
   /**
    * General purpose function for spawning creeps
@@ -14,16 +33,15 @@ export abstract class Mission {
    * @returns {Agent[]}
    */
   protected headCount(
-    roleName: string,
-    getBody: () => string[],
+    body: BodyDef,
     getMax: () => number,
     options: HeadCountOptions = {}): Agent[] {
 
     const agentArray = [];
-    if (!this.memory.hc[roleName]) {
-      this.memory.hc[roleName] = this.findOrphans(roleName);
+    if (!this.memory.hc[body.role]) {
+      this.memory.hc[body.role] = this.findOrphans(body.role);
     }
-    const creepNames = this.memory.hc[roleName] as string[];
+    const creepNames = this.memory.hc[body.role] as string[];
 
     let count = 0;
     for (let i = 0; i < creepNames.length; i++) {
@@ -51,17 +69,24 @@ export abstract class Mission {
       spawnGroup = options.altSpawnGroup;
     }
 
-    const allowSpawn = spawnGroup.isAvailable && this.allowSpawn && (this.hasVision || options.blindSpawn);
-    if (allowSpawn && count < getMax()) {
-      const creepName = `${this.operation.name}_${roleName}_${Math.floor(Math.random() * 100)}`;
-      const outcome = spawnGroup.spawn(getBody(), creepName, options.memory, options.reservation);
-      if (_.isString(outcome)) { creepNames.push(creepName); }
+    if (count < getMax()) {
+      const outcome = spawnGroup.create(body);
+      if (_.isString(outcome)) { creepNames.push(outcome); }
     }
 
     return agentArray;
   }
-
   protected abstract prepAgent(agent: Agent): boolean;
+
+  private findOrphans(roleName: string) {
+    const creepNames = [];
+    for (const creepName in Game.creeps) {
+      if (creepName.indexOf(roleName + "-") > -1) {
+        creepNames.push(creepName);
+      }
+    }
+    return creepNames;
+  }
 
   private _prepAgent(agent: Agent): boolean {
     if (!agent.memory.preped) {

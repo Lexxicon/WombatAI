@@ -14,9 +14,13 @@ export enum State {
 }
 
 export class EmergencyMiner implements Behaviour {
+  public static body = new BodyDef(
+    [WORK, CARRY, MOVE],
+    { state: State.HARVEST },
+    "EmergencyMiner");
 
   public getBody = () => {
-    return new BodyDef([WORK, MOVE, CARRY], { state: State.HARVEST }, "EmergencyMiner");
+    return EmergencyMiner.body;
   }
 
   public run = (creep: Creep) => {
