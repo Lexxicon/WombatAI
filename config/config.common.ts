@@ -95,6 +95,7 @@ export function init(options: EnvOptions): Config {
   config.plugin("define")
     .use(webpack.DefinePlugin, [{
       PRODUCTION: JSON.stringify(true),
+      __REPO__: JSON.stringify(`https://github.com/Lexxicon/WombatAI`),
       __BUILD_TIME__: JSON.stringify(Date.now()),
       __REVISION__: JSON.stringify(git.short()),
     }]);
