@@ -4,6 +4,10 @@
   ],
   "enable": true,
   "rules": {
+    "member-ordering": [
+      false
+    ],
+    "prefer-for-of": false,
     "forin": false,
     "interface-name": [
       false

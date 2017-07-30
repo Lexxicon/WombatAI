@@ -56,6 +56,7 @@ export class Hive {
       }
     }
     const result = this.spawnGroup.create(Hive.behaviours[0].getBody());
+
     if (_.isString(result)) {
       this.mem.emergencyMiners.push(result);
     }

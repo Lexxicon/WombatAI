@@ -7,7 +7,7 @@ export class SpawnGroup {
   constructor(room: Room) {
     this.room = room;
     this.spawns = room.find(FIND_MY_SPAWNS) as Spawn[];
-    this.availableSpawns = _.filter(this.spawns, { filter: { spawning: null } });
+    this.availableSpawns = _.filter(this.spawns, { spawning: null });
   }
 
   public create(def: BodyDef): number | string {

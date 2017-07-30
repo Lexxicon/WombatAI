@@ -2,6 +2,7 @@ interface Memory {
   uuid: number;
   log: any;
   username: string;
+  overmind: {};
 }
 
 declare const __REVISION__: string;
